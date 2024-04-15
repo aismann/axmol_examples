@@ -55,25 +55,25 @@ bool MainScene::init()
     // 2. add a menu item with "X" image, which is clicked to quit the program
     //    you may modify it.
 
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create("CloseNormal.png", "CloseSelected.png",
-        AX_CALLBACK_1(MainScene::menuCloseCallback, this));
+    //// add a "close" icon to exit the progress. it's an autorelease object
+    //auto closeItem = MenuItemImage::create("CloseNormal.png", "CloseSelected.png",
+    //    AX_CALLBACK_1(MainScene::menuCloseCallback, this));
 
-    if (closeItem == nullptr || closeItem->getContentSize().width <= 0 || closeItem->getContentSize().height <= 0)
-    {
-        problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
-    }
-    else
-    {
-        float x = safeOrigin.x + safeArea.size.width - closeItem->getContentSize().width / 2;
-        float y = safeOrigin.y + closeItem->getContentSize().height / 2;
-        closeItem->setPosition(Vec2(x, y));
-    }
+    //if (closeItem == nullptr || closeItem->getContentSize().width <= 0 || closeItem->getContentSize().height <= 0)
+    //{
+    //    problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
+    //}
+    //else
+    //{
+    //    float x = safeOrigin.x + safeArea.size.width - closeItem->getContentSize().width / 2;
+    //    float y = safeOrigin.y + closeItem->getContentSize().height / 2;
+    //    closeItem->setPosition(Vec2(x, y));
+    //}
 
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
+    //// create menu, it's an autorelease object
+    //auto menu = Menu::create(closeItem, NULL);
+    //menu->setPosition(Vec2::ZERO);
+    //this->addChild(menu, 1);
 
     /////////////////////////////
     // 3. add your codes below...
@@ -148,7 +148,27 @@ void MainScene::onTouchesBegan(const std::vector<ax::Touch*>& touches, ax::Event
     for (auto&& t : touches)
     {
         AXLOG("onTouchesBegan detected, X:%f  Y:%f", t->getLocation().x, t->getLocation().y);
+        int  xx =  (t->getLocation().x - xStart ) /  xWidth;
+        int  yy =  (t->getLocation().y - yStart ) /  yWidth;
+        if (grid[xx][yy] >= 100)
+        {
+            gridSprite[xx][yy]->setVisible(true);
+            foundFox++;
+            if (foundFox >= maxFox)
+            {
+                //  I am a WINNNER!!!!
+            }
+        }
+        else
+        {
+            gridValue[xx][yy]->setVisible(true);
+        }
     }
+
+  //  gridSprite[x][y]->setPosition(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2));
+
+
+
 }
 
 void MainScene::onTouchesMoved(const std::vector<ax::Touch*>& touches, ax::Event* event)
@@ -220,6 +240,8 @@ void MainScene::update(float delta)
                 for (int y = 0; y < yy; y++)
                 {
                     grid[x][y] = 0;
+                    gridSprite[x][y] = Sprite::create(fox);
+                    addChild(gridSprite[x][y],10);
                 }
         }
 
@@ -303,12 +325,15 @@ void MainScene::update(float delta)
                 for (int y = 0; y < yy; y++)
                 {
                     gridValue[x][y] = Label::createWithTTF(std::to_string(grid[x][y]).c_str(), "fonts/Marker Felt.ttf", 24);
-                    gridValue[x][y]->setVisible(true);
+                    gridValue[x][y]->setVisible(false); 
 
                     if (gridValue[x][y])
                     {
                         gridValue[x][y]->setPosition(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2));
                         addChild(gridValue[x][y], 1);
+                        gridSprite[x][y]->setVisible(false);
+                        gridSprite[x][y]->setScale(0.29);
+                        gridSprite[x][y]->setPosition(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2));
                         if (grid[x][y] >= 100)
                         {
                             gridValue[x][y]->setVisible(false);
@@ -361,7 +386,8 @@ void MainScene::update(float delta)
                 for (int y = 0; y < yy; y++)
                     if (grid[x][y] >= 100)
                     {
-                        drawUpdate->drawSolidCircle(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2), /*Vec2(xStart + x * xWidth, yStart+(xWidth*yy)),*/ 10, 90, 10, Color4B(Color4B::RED));
+      //                  gridSprite[x][y]->setVisible(true);
+                     //   drawUpdate->drawSolidCircle(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2), /*Vec2(xStart + x * xWidth, yStart+(xWidth*yy)),*/ 10, 90, 10, Color4B(Color4B::RED));
                     }
         }
 

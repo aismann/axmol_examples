@@ -82,8 +82,10 @@ private:
     ax::Label* gridValue[_XXX][_YYY];
     ax::Sprite* gridSprite[_XXX][_YYY];
     int maxFox = 10;
+    int foundFox = 0;
 
-    std::string fox = "istockphoto-516954884-612x612.jpg";
+  //  std::string fox = "istockphoto-516954884-612x612.jpg";
+    std::string_view fox = "108861585.png";
 
     ax::Color3B countColor[_XXX+1] = {    ax::Color3B::WHITE,     // (255, 255, 255)
                                         ax::Color3B::BLUE,      // (0, 0, 255)
