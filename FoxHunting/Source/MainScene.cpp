@@ -51,44 +51,21 @@ bool MainScene::init()
     auto safeArea = _director->getSafeAreaRect();
     auto safeOrigin = safeArea.origin;
 
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    //// add a "close" icon to exit the progress. it's an autorelease object
-    //auto closeItem = MenuItemImage::create("CloseNormal.png", "CloseSelected.png",
-    //    AX_CALLBACK_1(MainScene::menuCloseCallback, this));
-
-    //if (closeItem == nullptr || closeItem->getContentSize().width <= 0 || closeItem->getContentSize().height <= 0)
-    //{
-    //    problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
-    //}
-    //else
-    //{
-    //    float x = safeOrigin.x + safeArea.size.width - closeItem->getContentSize().width / 2;
-    //    float y = safeOrigin.y + closeItem->getContentSize().height / 2;
-    //    closeItem->setPosition(Vec2(x, y));
-    //}
-
-    //// create menu, it's an autorelease object
-    //auto menu = Menu::create(closeItem, NULL);
-    //menu->setPosition(Vec2::ZERO);
-    //this->addChild(menu, 1);
 
     /////////////////////////////
     // 3. add your codes below...
 
     // Some templates (uncomment what you  need)
-    auto touchListener = EventListenerTouchAllAtOnce::create();
-    touchListener->onTouchesBegan = AX_CALLBACK_2(MainScene::onTouchesBegan, this);
-    touchListener->onTouchesMoved = AX_CALLBACK_2(MainScene::onTouchesMoved, this);
-    touchListener->onTouchesEnded = AX_CALLBACK_2(MainScene::onTouchesEnded, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
+    //auto touchListener = EventListenerTouchAllAtOnce::create();
+    //touchListener->onTouchesBegan = AX_CALLBACK_2(MainScene::onTouchesBegan, this);
+    //touchListener->onTouchesMoved = AX_CALLBACK_2(MainScene::onTouchesMoved, this);
+    //touchListener->onTouchesEnded = AX_CALLBACK_2(MainScene::onTouchesEnded, this);
+    //_eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
-    auto mouseListener           = EventListenerMouse::create();
-    mouseListener->onMouseMove   = AX_CALLBACK_1(MainScene::onMouseMove, this);
-    mouseListener->onMouseUp     = AX_CALLBACK_1(MainScene::onMouseUp, this);
-    mouseListener->onMouseDown   = AX_CALLBACK_1(MainScene::onMouseDown, this);
+    auto mouseListener = EventListenerMouse::create();
+    mouseListener->onMouseMove = AX_CALLBACK_1(MainScene::onMouseMove, this);
+    mouseListener->onMouseUp = AX_CALLBACK_1(MainScene::onMouseUp, this);
+    mouseListener->onMouseDown = AX_CALLBACK_1(MainScene::onMouseDown, this);
     mouseListener->onMouseScroll = AX_CALLBACK_1(MainScene::onMouseScroll, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
 
@@ -96,7 +73,6 @@ bool MainScene::init()
     //keyboardListener->onKeyPressed  = AX_CALLBACK_2(MainScene::onKeyPressed, this);
     //keyboardListener->onKeyReleased = AX_CALLBACK_2(MainScene::onKeyReleased, this);
     //_eventDispatcher->addEventListenerWithFixedPriority(keyboardListener, 11);
-
 
 
 
@@ -136,6 +112,23 @@ bool MainScene::init()
     //}
 
     // scheduleUpdate() is required to ensure update(float) is called on every loop
+
+
+    auto menuNewGame = MenuItemFont::create("New Game", AX_CALLBACK_1(MainScene::menuNewGameCallback, this));
+    auto menuExitGame = MenuItemFont::create("Exit", AX_CALLBACK_1(MainScene::menuExitGameCallback, this));
+    auto menuCredits = MenuItemFont::create("Credits/Info", AX_CALLBACK_1(MainScene::menuCreditsCallback, this));
+
+    menu1 = Menu::create(menuNewGame, menuExitGame, menuCredits, nullptr);
+    addChild(menu1, 10);
+    menu1->alignItemsVertically();
+
+    auto s = Director::getInstance()->getWinSize();
+    menu1->setPosition(Vec2(s.width / 2, s.height / 2));
+
+
+
+
+
     scheduleUpdate();
 
     return true;
@@ -148,11 +141,6 @@ void MainScene::onTouchesBegan(const std::vector<ax::Touch*>& touches, ax::Event
     {
         AXLOG("onTouchesBegan detected, X:%f  Y:%f", t->getLocation().x, t->getLocation().y);
     }
-
-  //  gridSprite[x][y]->setPosition(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2));
-
-
-
 }
 
 void MainScene::onTouchesMoved(const std::vector<ax::Touch*>& touches, ax::Event* event)
@@ -175,6 +163,13 @@ void MainScene::onMouseDown(Event* event)
 {
     EventMouse* e = static_cast<EventMouse*>(event);
     AXLOG("onMouseDown detected, Key: %d", static_cast<int>(e->getMouseButton()));
+
+    //if (_gameState == GameState::init)
+    //{
+    //    return;
+    //}
+
+
     mouseButton = static_cast<int>(e->getMouseButton());
     int xx = mousePointer.x;
     int yy = mousePointer.y;
@@ -198,7 +193,6 @@ void MainScene::onMouseDown(Event* event)
                 AXLOG(" I am a WINNNER!!!!");
             }
         }
-
     }
     else
     {
@@ -213,9 +207,6 @@ void MainScene::onMouseDown(Event* event)
 
         }
     }
-
-
-
 }
 
 void MainScene::onMouseUp(Event* event)
@@ -227,10 +218,8 @@ void MainScene::onMouseUp(Event* event)
 void MainScene::onMouseMove(Event* event)
 {
     EventMouse* e = static_cast<EventMouse*>(event);
- //   AXLOG("onMouseMove detected, X:%f  Y:%f", e->getCursorX(), e->getCursorY());
+    //   AXLOG("onMouseMove detected, X:%f  Y:%f", e->getCursorX(), e->getCursorY());
     mousePointer = Vec2((e->getCursorX() - xStart) / xWidth, (e->getCursorY() - yStart) / yWidth);
-
-  //  int  yy =  (t->getLocation().y - yStart ) /  yWidth;
 }
 
 void MainScene::onMouseScroll(Event* event)
@@ -255,21 +244,16 @@ void MainScene::update(float delta)
     {
     case GameState::init:
     {
+
         draw = DrawNode::create();
         addChild(draw, 10);
 
-        drawUpdate = DrawNode::create();
-        addChild(drawUpdate, 10);
-
-
-        // init the grid
+        // clear the grid
         {
             for (int x = 0; x < xx; x++)
                 for (int y = 0; y < yy; y++)
                 {
                     grid[x][y] = 0;
-                    gridSprite[x][y] = Sprite::create(fox);
-                    addChild(gridSprite[x][y],10);
                 }
         }
 
@@ -352,34 +336,21 @@ void MainScene::update(float delta)
             {
                 for (int y = 0; y < yy; y++)
                 {
+                    gridSprite[x][y] = Sprite::create(fox);
+                    gridSprite[x][y]->setVisible(false);
+                    gridSprite[x][y]->setScale(0.29);
+                    gridSprite[x][y]->setPosition(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2));
+                    addChild(gridSprite[x][y], 10);
+
                     gridValue[x][y] = Label::createWithTTF(std::to_string(grid[x][y]).c_str(), "fonts/Marker Felt.ttf", 24);
-                    gridValue[x][y]->setVisible(false); 
+                    gridValue[x][y]->setVisible(false);
+                    gridValue[x][y]->setPosition(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2));
+                    addChild(gridValue[x][y], 1);
 
-                    if (gridValue[x][y])
+                    if (grid[x][y] < 100)
                     {
-                        gridValue[x][y]->setPosition(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2));
-                        addChild(gridValue[x][y], 1);
-                        gridSprite[x][y]->setVisible(false);
-                        gridSprite[x][y]->setScale(0.29);
-                        gridSprite[x][y]->setPosition(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2));
-                        if (grid[x][y] >= 100)
-                        {
-                            gridValue[x][y]->setVisible(false);
-                        }
-                        else
-                        {
-                            gridValue[x][y]->setColor(countColor[grid[x][y]]);
-                        }
- 
+                        gridValue[x][y]->setColor(countColor[grid[x][y]]);
                     }
-                    else
-                    {
-                        AXLOG("ERROR");
-                    }
-
-             //       AXLOG("%s", std::to_string(grid[x][y]).c_str());
-             ////       gridValue[x][y]->setString(std::to_string(grid[x][y]));
-             //    //   gridValue[x][y]->setString(std::to_string(grid[x][y]).c_str());
                 }
             }
         }
@@ -394,7 +365,7 @@ void MainScene::update(float delta)
             draw->drawLine(Vec2(xStart, yStart + y * yWidth), Vec2(xStart + (yWidth * xx), yStart + y * yWidth), Color4B::GREEN);
         }
 
-        _gameState = GameState::update;
+    //    _gameState = GameState::update;
         break;
     }
 
@@ -407,17 +378,17 @@ void MainScene::update(float delta)
         // UpdatePlayer();
         // UpdatePhysics();
         // ...
-        drawUpdate->clear();
-        // draw the grid content
-        {
-            for (int x = 0; x < xx; x++)
-                for (int y = 0; y < yy; y++)
-                    if (grid[x][y] >= 100)
-                    {
-      //                  gridSprite[x][y]->setVisible(true);
-                     //   drawUpdate->drawSolidCircle(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2), /*Vec2(xStart + x * xWidth, yStart+(xWidth*yy)),*/ 10, 90, 10, Color4B(Color4B::RED));
-                    }
-        }
+      //  drawUpdate->clear();
+      //  // draw the grid content
+      //  {
+      //      for (int x = 0; x < xx; x++)
+      //          for (int y = 0; y < yy; y++)
+      //              if (grid[x][y] >= 100)
+      //              {
+      ////                  gridSprite[x][y]->setVisible(true);
+      //               //   drawUpdate->drawSolidCircle(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2), /*Vec2(xStart + x * xWidth, yStart+(xWidth*yy)),*/ 10, 90, 10, Color4B(Color4B::RED));
+      //              }
+      //  }
 
         break;
     }
@@ -432,39 +403,10 @@ void MainScene::update(float delta)
         break;
     }
 
-    case GameState::menu1:
-    {    /////////////////////////////
-        // Add your codes below...like....
-        // 
-        // UpdateMenu1();
-        break;
-    }
-
-    case GameState::menu2:
-    {    /////////////////////////////
-        // Add your codes below...like....
-        // 
-        // UpdateMenu2();
-        break;
-    }
-
-
     case GameState::winner:
     {    /////////////////////////////
          // Add your codes below...like....
          // 
-
-        auto menuContinueGame = MenuItemFont::create("Spiel fortsetzen", AX_CALLBACK_1(MainScene::menuContinueGameCallback, this));
-        auto menuNewGame = MenuItemFont::create("Neues Spiel", AX_CALLBACK_1(MainScene::menuNewGameCallback, this));
-        auto menuExitGame = MenuItemFont::create("Exit", AX_CALLBACK_1(MainScene::menuExitGameCallback, this));
-        auto menuCredits = MenuItemFont::create("Credits", AX_CALLBACK_1(MainScene::menuCreditsCallback, this));
-
-        auto menu1 = Menu::create(menuContinueGame, menuNewGame, menuExitGame, menuCredits, nullptr);
-        addChild(menu1, 10);
-        menu1->alignItemsVertically();
-
-        auto s = Director::getInstance()->getWinSize();
-        menu1->setPosition(Vec2(s.width / 2, s.height / 2));
 
         break;
     }
@@ -472,18 +414,6 @@ void MainScene::update(float delta)
     {    /////////////////////////////
          // Add your codes below...like....
          // 
-
-        auto menuContinueGame = MenuItemFont::create("Spiel fortsetzen", AX_CALLBACK_1(MainScene::menuContinueGameCallback, this));
-        auto menuNewGame = MenuItemFont::create("Neues Spiel", AX_CALLBACK_1(MainScene::menuNewGameCallback, this));
-        auto menuExitGame = MenuItemFont::create("Exit", AX_CALLBACK_1(MainScene::menuExitGameCallback, this));
-        auto menuCredits = MenuItemFont::create("Credits", AX_CALLBACK_1(MainScene::menuCreditsCallback, this));
-
-        auto menu1 = Menu::create(menuContinueGame, menuNewGame, menuExitGame, menuCredits, nullptr);
-        addChild(menu1, 10);
-        menu1->alignItemsVertically();
-
-        auto s = Director::getInstance()->getWinSize();
-        menu1->setPosition(Vec2(s.width / 2, s.height / 2));
 
         break;
     }
@@ -520,11 +450,13 @@ void MainScene::menuContinueGameCallback(Ref* sender)
 }
 void MainScene::menuNewGameCallback(Ref* sender)
 {
-
+    mousePointer = { -100, -100 };
+    menu1->setVisible(false);
+    _gameState = GameState::init;
 }
 void MainScene::menuExitGameCallback(Ref* sender)
 {
-
+    menuCloseCallback(sender);
 }
 void MainScene::menuCreditsCallback(Ref* sender)
 {

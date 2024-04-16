@@ -37,8 +37,6 @@ class MainScene : public ax::Scene
         update,
         pause,
         end,
-        menu1,
-        menu2,
         winner,
         looser,
     };
@@ -93,6 +91,8 @@ private:
     int foundFox = 0;
     int mouseButton;
     ax::Vec2 mousePointer;
+
+    ax::Menu* menu1;
 
     std::string_view fox = "108861585.png";
 
