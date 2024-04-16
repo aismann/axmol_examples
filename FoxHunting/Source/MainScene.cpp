@@ -85,12 +85,12 @@ bool MainScene::init()
     touchListener->onTouchesEnded = AX_CALLBACK_2(MainScene::onTouchesEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
-    //auto mouseListener           = EventListenerMouse::create();
-    //mouseListener->onMouseMove   = AX_CALLBACK_1(MainScene::onMouseMove, this);
-    //mouseListener->onMouseUp     = AX_CALLBACK_1(MainScene::onMouseUp, this);
-    //mouseListener->onMouseDown   = AX_CALLBACK_1(MainScene::onMouseDown, this);
-    //mouseListener->onMouseScroll = AX_CALLBACK_1(MainScene::onMouseScroll, this);
-    //_eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+    auto mouseListener           = EventListenerMouse::create();
+    mouseListener->onMouseMove   = AX_CALLBACK_1(MainScene::onMouseMove, this);
+    mouseListener->onMouseUp     = AX_CALLBACK_1(MainScene::onMouseUp, this);
+    mouseListener->onMouseDown   = AX_CALLBACK_1(MainScene::onMouseDown, this);
+    mouseListener->onMouseScroll = AX_CALLBACK_1(MainScene::onMouseScroll, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
 
     //auto keyboardListener           = EventListenerKeyboard::create();
     //keyboardListener->onKeyPressed  = AX_CALLBACK_2(MainScene::onKeyPressed, this);
@@ -99,23 +99,22 @@ bool MainScene::init()
 
 
 
-    // add a label shows "Hello World"
-    // create and initialize a label
 
-    //auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-    //if (label == nullptr)
-    //{
-    //    problemLoading("'fonts/Marker Felt.ttf'");
-    //}
-    //else
-    //{
-    //    // position the label on the center of the screen
-    //    label->setPosition(
-    //        Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height - label->getContentSize().height));
 
-    //    // add the label as a child to this layer
-    //    this->addChild(label, 1);
-    //}
+    auto label = Label::createWithTTF("Find the 10 foxes", "fonts/Marker Felt.ttf", 24);
+    if (label == nullptr)
+    {
+        problemLoading("'fonts/Marker Felt.ttf'");
+    }
+    else
+    {
+        // position the label on the center of the screen
+        label->setPosition(
+            Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height - label->getContentSize().height));
+
+        // add the label as a child to this layer
+        this->addChild(label, 1);
+    }
     // add "HelloWorld" splash screen"
     //auto sprite = Sprite::create("HelloWorld.png"sv);
     //if (sprite == nullptr)
@@ -148,21 +147,6 @@ void MainScene::onTouchesBegan(const std::vector<ax::Touch*>& touches, ax::Event
     for (auto&& t : touches)
     {
         AXLOG("onTouchesBegan detected, X:%f  Y:%f", t->getLocation().x, t->getLocation().y);
-        int  xx =  (t->getLocation().x - xStart ) /  xWidth;
-        int  yy =  (t->getLocation().y - yStart ) /  yWidth;
-        if (grid[xx][yy] >= 100)
-        {
-            gridSprite[xx][yy]->setVisible(true);
-            foundFox++;
-            if (foundFox >= maxFox)
-            {
-                //  I am a WINNNER!!!!
-            }
-        }
-        else
-        {
-            gridValue[xx][yy]->setVisible(true);
-        }
     }
 
   //  gridSprite[x][y]->setPosition(Vec2(xStart + x * xWidth + xWidth / 2, yStart + y * yWidth + yWidth / 2));
@@ -191,6 +175,47 @@ void MainScene::onMouseDown(Event* event)
 {
     EventMouse* e = static_cast<EventMouse*>(event);
     AXLOG("onMouseDown detected, Key: %d", static_cast<int>(e->getMouseButton()));
+    mouseButton = static_cast<int>(e->getMouseButton());
+    int xx = mousePointer.x;
+    int yy = mousePointer.y;
+
+    if (grid[xx][yy] >= 100)
+    {
+        gridSprite[xx][yy]->setVisible(true);
+        if (mouseButton == 0)
+        {
+            //  I am a LOOSER!!!!
+            _gameState = GameState::looser;
+            AXLOG(" I am a LOOSER!!!!");
+        }
+        else
+        {
+            foundFox++;
+            if (foundFox >= maxFox)
+            {
+                //  I am a WINNNER!!!!
+                _gameState = GameState::winner;
+                AXLOG(" I am a WINNNER!!!!");
+            }
+        }
+
+    }
+    else
+    {
+        if (mouseButton == 0)
+        {
+            gridValue[xx][yy]->setVisible(true);
+            gridSprite[xx][yy]->setVisible(false);
+        }
+        else
+        {
+            gridSprite[xx][yy]->setVisible(true);
+
+        }
+    }
+
+
+
 }
 
 void MainScene::onMouseUp(Event* event)
@@ -202,7 +227,10 @@ void MainScene::onMouseUp(Event* event)
 void MainScene::onMouseMove(Event* event)
 {
     EventMouse* e = static_cast<EventMouse*>(event);
-    AXLOG("onMouseMove detected, X:%f  Y:%f", e->getCursorX(), e->getCursorY());
+ //   AXLOG("onMouseMove detected, X:%f  Y:%f", e->getCursorX(), e->getCursorY());
+    mousePointer = Vec2((e->getCursorX() - xStart) / xWidth, (e->getCursorY() - yStart) / yWidth);
+
+  //  int  yy =  (t->getLocation().y - yStart ) /  yWidth;
 }
 
 void MainScene::onMouseScroll(Event* event)
@@ -420,6 +448,46 @@ void MainScene::update(float delta)
         break;
     }
 
+
+    case GameState::winner:
+    {    /////////////////////////////
+         // Add your codes below...like....
+         // 
+
+        auto menuContinueGame = MenuItemFont::create("Spiel fortsetzen", AX_CALLBACK_1(MainScene::menuContinueGameCallback, this));
+        auto menuNewGame = MenuItemFont::create("Neues Spiel", AX_CALLBACK_1(MainScene::menuNewGameCallback, this));
+        auto menuExitGame = MenuItemFont::create("Exit", AX_CALLBACK_1(MainScene::menuExitGameCallback, this));
+        auto menuCredits = MenuItemFont::create("Credits", AX_CALLBACK_1(MainScene::menuCreditsCallback, this));
+
+        auto menu1 = Menu::create(menuContinueGame, menuNewGame, menuExitGame, menuCredits, nullptr);
+        addChild(menu1, 10);
+        menu1->alignItemsVertically();
+
+        auto s = Director::getInstance()->getWinSize();
+        menu1->setPosition(Vec2(s.width / 2, s.height / 2));
+
+        break;
+    }
+    case GameState::looser:
+    {    /////////////////////////////
+         // Add your codes below...like....
+         // 
+
+        auto menuContinueGame = MenuItemFont::create("Spiel fortsetzen", AX_CALLBACK_1(MainScene::menuContinueGameCallback, this));
+        auto menuNewGame = MenuItemFont::create("Neues Spiel", AX_CALLBACK_1(MainScene::menuNewGameCallback, this));
+        auto menuExitGame = MenuItemFont::create("Exit", AX_CALLBACK_1(MainScene::menuExitGameCallback, this));
+        auto menuCredits = MenuItemFont::create("Credits", AX_CALLBACK_1(MainScene::menuCreditsCallback, this));
+
+        auto menu1 = Menu::create(menuContinueGame, menuNewGame, menuExitGame, menuCredits, nullptr);
+        addChild(menu1, 10);
+        menu1->alignItemsVertically();
+
+        auto s = Director::getInstance()->getWinSize();
+        menu1->setPosition(Vec2(s.width / 2, s.height / 2));
+
+        break;
+    }
+
     case GameState::end:
     {    /////////////////////////////
         // Add your codes below...like....
@@ -443,4 +511,22 @@ void MainScene::menuCloseCallback(Ref* sender)
 
      // EventCustom customEndEvent("game_scene_close_event");
      //_eventDispatcher->dispatchEvent(&customEndEvent);
+}
+
+// a selector callback
+void MainScene::menuContinueGameCallback(Ref* sender)
+{
+
+}
+void MainScene::menuNewGameCallback(Ref* sender)
+{
+
+}
+void MainScene::menuExitGameCallback(Ref* sender)
+{
+
+}
+void MainScene::menuCreditsCallback(Ref* sender)
+{
+
 }

@@ -39,6 +39,8 @@ class MainScene : public ax::Scene
         end,
         menu1,
         menu2,
+        winner,
+        looser,
     };
 
     
@@ -64,6 +66,12 @@ public:
     // a selector callback
     void menuCloseCallback(Ref* sender);
 
+    // a selector callback
+    void menuContinueGameCallback(Ref* sender);
+    void menuNewGameCallback(Ref* sender);
+    void menuExitGameCallback(Ref* sender);
+    void menuCreditsCallback(Ref* sender);
+
 private:
     GameState _gameState = GameState::init;
     ax::DrawNode* draw;
@@ -83,11 +91,12 @@ private:
     ax::Sprite* gridSprite[_XXX][_YYY];
     int maxFox = 10;
     int foundFox = 0;
+    int mouseButton;
+    ax::Vec2 mousePointer;
 
-  //  std::string fox = "istockphoto-516954884-612x612.jpg";
     std::string_view fox = "108861585.png";
 
-    ax::Color3B countColor[_XXX+1] = {    ax::Color3B::WHITE,     // (255, 255, 255)
+    ax::Color3B countColor[_XXX+1] = {   ax::Color3B::WHITE,     // (255, 255, 255)
                                         ax::Color3B::BLUE,      // (0, 0, 255)
                                         ax::Color3B::YELLOW,    // (255, 255, 0)
                                         ax::Color3B::GREEN,     // (0, 255, 0)
